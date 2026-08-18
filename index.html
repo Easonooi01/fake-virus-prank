@@ -1,152 +1,202 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Bitcoin Miner Simulator</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Bitcoin Mine — Test Store</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#07111f;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.app{max-width:520px;margin:auto;min-height:100vh;padding:18px}
-h1{margin:4px 0 4px;font-size:30px}
-.sub{color:#9fb0c7;margin-bottom:18px}
-.card{background:#101d2e;border:1px solid #243650;border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 8px 30px #0003}
-.row{display:flex;justify-content:space-between;gap:12px;align-items:center}
-.balance{font-size:38px;font-weight:800;margin:8px 0}
-.label{color:#9fb0c7;font-size:14px}
-.price{font-size:24px;font-weight:700}
-button{width:100%;border:0;border-radius:14px;padding:15px;margin-top:10px;font-size:17px;font-weight:700;background:#f7931a;color:#111}
-button.secondary{background:#20324b;color:#fff}
-button:disabled{opacity:.45}
-.mine{font-size:21px;padding:19px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat{background:#0b1726;border-radius:14px;padding:13px}
-.stat b{display:block;font-size:20px;margin-top:4px}
-.progress{height:12px;background:#07101c;border-radius:20px;overflow:hidden;margin-top:10px}
-.bar{height:100%;width:0;background:#f7931a;transition:.2s}
-.log{max-height:150px;overflow:auto;color:#b8c7da;font-size:13px;line-height:1.6}
-.note{font-size:12px;color:#7f91aa;line-height:1.5}
-.upgrade{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.upgrade button{width:auto;padding:10px 13px;margin:0}
-.badge{background:#19395b;color:#8fc7ff;border-radius:999px;padding:5px 9px;font-size:12px}
+body{margin:0;background:#080612;color:#f8f5ff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app{max-width:520px;margin:auto;min-height:100vh;padding:16px}
+.header{display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:23px;font-weight:850}.pill{background:#7041d7;padding:6px 9px;border-radius:99px;font-size:11px}
+.card{background:linear-gradient(145deg,#171126,#0f0b1c);border:1px solid #30234d;border-radius:20px;padding:17px;margin:12px 0;box-shadow:0 12px 35px #0006}
+.label{font-size:12px;color:#aa9dc0;letter-spacing:.4px}
+.balance{font-size:29px;font-weight:850;margin:5px 0 14px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.stat{background:#0d0917;border:1px solid #251b39;border-radius:13px;padding:12px}
+.stat b{display:block;font-size:19px;margin-top:4px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:12px 0}
+.tabs button{margin:0;background:#171025;color:#bdb0d0;padding:11px 5px;font-size:12px}
+.tabs button.active{background:#7b45e5;color:#fff}
+.page{display:none}.page.active{display:block}
+.mine{text-align:center;padding:22px 14px}
+.rock{font-size:105px;filter:drop-shadow(0 0 20px #7c45ff);animation:float 1.8s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px) scale(1.03)}}
+.power{font-size:25px;font-weight:850}
+.bar{height:10px;background:#241b35;border-radius:20px;overflow:hidden;margin:14px 5px}
+.fill{height:100%;width:35%;background:linear-gradient(90deg,#6d3fd1,#b46cff)}
+button{width:100%;border:0;border-radius:13px;padding:14px;margin-top:9px;font-size:16px;font-weight:750;background:#7b45e5;color:#fff}
+button.secondary{background:#211733;color:#e9ddff;border:1px solid #3b2a5b}
+.shop{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid #2a203e}
+.shop:last-child{border-bottom:0}
+.shop button{width:auto;margin:0;padding:10px 13px}
+.price{font-weight:800;color:#d8c8ff}
+.note{font-size:12px;line-height:1.5;color:#aaa0b8}
+.modal{display:none;position:fixed;inset:0;background:#000a;align-items:flex-end;justify-content:center;padding:12px}
+.modal.show{display:flex}
+.sheet{width:100%;max-width:500px;background:#151025;border:1px solid #392b56;border-radius:22px;padding:20px}
+.confirm{font-size:20px;font-weight:800}
+.success{display:none;text-align:center}
+.success.show{display:block}
+.item{padding:9px 0;border-bottom:1px solid #271d39;font-size:13px;color:#c9bfda}
 </style>
 </head>
 <body>
 <div class="app">
-  <h1>₿ Bitcoin Miner</h1>
-  <div class="sub">虚拟挖矿模拟器 · 不涉及真钱</div>
+<div class="header"><div class="logo">₿ Bitcoin Mine</div><div class="pill">TEST / SANDBOX</div></div>
 
-  <div class="card">
-    <div class="label">游戏内 BTC</div>
-    <div class="balance" id="btc">0.00000000 BTC</div>
-    <div class="row"><span class="label">模拟 BTC 价格</span><span class="price" id="price">RM 300,000</span></div>
-  </div>
+<div class="card">
+<div class="label">VIRTUAL BTC BALANCE</div>
+<div class="balance" id="btc">0.0000000000 BTC</div>
+<div class="stats">
+<div class="stat"><span class="label">MINING POWER</span><b id="power">5 GH/s</b></div>
+<div class="stat"><span class="label">MINERS</span><b id="miners">1</b></div>
+</div>
+</div>
 
-  <div class="card">
-    <div class="row">
-      <div><div class="label">当前算力</div><b id="hash">10 TH/s</b></div>
-      <span class="badge" id="level">Lv.1</span>
-    </div>
-    <div class="progress"><div class="bar" id="bar"></div></div>
-    <button class="mine" id="mineBtn">⛏️ 开始挖矿</button>
-    <button class="secondary" id="collectBtn">🎁 收取离线奖励</button>
-  </div>
+<div class="tabs">
+<button class="active" onclick="show('mine',this)">⛏ Mine</button>
+<button onclick="show('miners',this)">👷 Miners</button>
+<button onclick="show('shop',this)">🛒 Shop</button>
+<button onclick="show('wallet',this)">₿ Wallet</button>
+</div>
 
-  <div class="card">
-    <div class="label">矿机升级</div>
-    <div class="upgrade">
-      <div><b>ASIC Miner</b><div class="note">+10 TH/s · 价格：<span id="upgradeCost">0.00005000</span> BTC</div></div>
-      <button id="upgradeBtn">升级</button>
-    </div>
-  </div>
+<section id="mine" class="page active">
+<div class="card mine">
+<div class="label">ACTIVE MINING</div>
+<div class="rock">💎</div>
+<div class="power" id="mineText">Mining...</div>
+<div class="bar"><div class="fill" id="fill"></div></div>
+<div class="label">Virtual BTC generation</div>
+</div>
+<button onclick="daily()">🎁 Claim Daily Miner</button>
+</section>
 
-  <div class="card">
-    <div class="grid">
-      <div class="stat"><span class="label">今日挖矿</span><b id="today">0.00000000</b></div>
-      <div class="stat"><span class="label">总挖矿</span><b id="total">0.00000000</b></div>
-      <div class="stat"><span class="label">连续点击</span><b id="streak">0</b></div>
-      <div class="stat"><span class="label">预计每秒</span><b id="rate">0.00000001</b></div>
-    </div>
-  </div>
+<section id="miners" class="page">
+<div class="card">
+<h2>👷 Miner Center</h2>
+<div class="shop"><div><b>Basic Miner</b><br><span class="note">+5 GH/s · virtual item</span></div><button onclick="buyGameItem('Basic Miner',5,.00005)">0.00005 BTC</button></div>
+<div class="shop"><div><b>Pro Miner</b><br><span class="note">+25 GH/s · virtual item</span></div><button onclick="buyGameItem('Pro Miner',25,.0002)">0.00020 BTC</button></div>
+<div class="shop"><div><b>Ultra Miner</b><br><span class="note">+100 GH/s · virtual item</span></div><button onclick="buyGameItem('Ultra Miner',100,.00075)">0.00075 BTC</button></div>
+</div>
+</section>
 
-  <div class="card">
-    <div class="label">活动记录</div>
-    <div class="log" id="log"></div>
-  </div>
+<section id="shop" class="page">
+<div class="card">
+<h2>🛒 Premium Store</h2>
+<p class="note">These are test products. The buttons simulate a successful store purchase and do not charge money.</p>
 
-  <div class="card note">
-    ⚠️ 这是纯模拟游戏。BTC、余额、价格和奖励都是虚拟数据，不能充值、提现或兑换真实 Bitcoin / 现金。
-  </div>
+<div class="shop">
+<div><b>Miner Pack</b><br><span class="note">+50 GH/s</span><br><span class="price">RM 4.90</span></div>
+<button onclick="openPurchase('Miner Pack','RM 4.90','+50 GH/s',50)">Purchase</button>
+</div>
+
+<div class="shop">
+<div><b>Pro Miner Pack</b><br><span class="note">+150 GH/s</span><br><span class="price">RM 9.90</span></div>
+<button onclick="openPurchase('Pro Miner Pack','RM 9.90','+150 GH/s',150)">Purchase</button>
+</div>
+
+<div class="shop">
+<div><b>Premium Miner</b><br><span class="note">+400 GH/s</span><br><span class="price">RM 19.90</span></div>
+<button onclick="openPurchase('Premium Miner','RM 19.90','+400 GH/s',400)">Purchase</button>
+</div>
+</div>
+</section>
+
+<section id="wallet" class="page">
+<div class="card">
+<h2>₿ Virtual Wallet</h2>
+<div class="balance" id="walletBtc">0.0000000000 BTC</div>
+<p class="note">Virtual BTC has no cash value. This prototype does not send or receive real Bitcoin.</p>
+<button class="secondary" onclick="resetGame()">Reset Test Data</button>
+</div>
+<div class="card"><h3>Purchase & Activity History</h3><div id="log"></div></div>
+</section>
+
+<div class="card note">
+⚠️ TEST VERSION: no real payment is processed. When this game is ready for release, real digital-item purchases should be connected through the appropriate App Store / Google Play billing flow and verified by a secure backend.
+</div>
+</div>
+
+<div class="modal" id="modal">
+<div class="sheet">
+<div id="confirmBox">
+<div class="label">TEST PURCHASE</div>
+<div class="confirm" id="productName"></div>
+<p id="productDetail" class="note"></p>
+<button onclick="confirmPurchase()">Confirm Test Purchase</button>
+<button class="secondary" onclick="closeModal()">Cancel</button>
+</div>
+<div id="successBox" class="success">
+<div style="font-size:60px">✅</div>
+<h2>Purchase Successful</h2>
+<p id="successText" class="note"></p>
+<button onclick="closeModal()">Continue Playing</button>
+</div>
+</div>
 </div>
 
 <script>
-const KEY="btcMinerSimulatorV1";
-let s=JSON.parse(localStorage.getItem(KEY)||"null")||{
- btc:0,total:0,today:0,hash:10,level:1,streak:0,price:300000,last:Date.now(),day:new Date().toDateString()
-};
-
-function save(){localStorage.setItem(KEY,JSON.stringify(s))}
-function rate(){return s.hash*0.000000001}
-function cost(){return 0.00005*Math.pow(1.55,s.level-1)}
-function fmt(n){return Number(n).toFixed(8)}
-function log(t){
- const el=document.getElementById("log");
- const d=document.createElement("div"); d.textContent="• "+new Date().toLocaleTimeString()+"  "+t;
- el.prepend(d);
- while(el.children.length>12)el.lastChild.remove();
-}
+const KEY="bitcoinMineStoreTestV1";
+let s=JSON.parse(localStorage.getItem(KEY)||"null")||{btc:0,power:5,miners:1,day:"",logs:[]};
+let pending=null;
+function fmt(n){return Number(n).toFixed(10)}
+function save(){localStorage.setItem(KEY,JSON.stringify(s));render()}
+function log(t){s.logs.unshift(new Date().toLocaleTimeString()+" — "+t);s.logs=s.logs.slice(0,15)}
 function render(){
- document.getElementById("btc").textContent=fmt(s.btc)+" BTC";
- document.getElementById("total").textContent=fmt(s.total);
- document.getElementById("today").textContent=fmt(s.today);
- document.getElementById("hash").textContent=s.hash+" TH/s";
- document.getElementById("level").textContent="Lv."+s.level;
- document.getElementById("price").textContent="RM "+Math.round(s.price).toLocaleString();
- document.getElementById("streak").textContent=s.streak;
- document.getElementById("rate").textContent=fmt(rate());
- document.getElementById("upgradeCost").textContent=fmt(cost());
- document.getElementById("upgradeBtn").disabled=s.btc<cost();
+document.getElementById("btc").textContent=fmt(s.btc)+" BTC";
+document.getElementById("walletBtc").textContent=fmt(s.btc)+" BTC";
+document.getElementById("power").textContent=s.power+" GH/s";
+document.getElementById("miners").textContent=s.miners;
+document.getElementById("log").innerHTML=s.logs.map(x=>'<div class="item">'+x+"</div>").join("");
 }
-function mine(){
- const reward=rate()*3*(1+Math.min(s.streak,20)*0.01);
- s.btc+=reward;s.total+=reward;s.today+=reward;s.streak++;
- document.getElementById("bar").style.width=Math.min(100,s.streak%101)+"%";
- log("获得 +"+fmt(reward)+" BTC");
- save();render();
+function show(id,btn){
+document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));
+btn.classList.add("active");
 }
-function upgrade(){
- const c=cost();
- if(s.btc<c)return;
- s.btc-=c;s.hash+=10;s.level++;
- s.streak=0;log("矿机升级成功：+10 TH/s");save();render();
+function openPurchase(name,price,detail,power){
+pending={name,price,detail,power};
+document.getElementById("productName").textContent=name+" — "+price;
+document.getElementById("productDetail").textContent=detail+" • Test/Sandbox purchase • No real charge";
+document.getElementById("confirmBox").style.display="block";
+document.getElementById("successBox").classList.remove("show");
+document.getElementById("modal").classList.add("show");
 }
-function collect(){
- const now=Date.now(), hours=Math.min(12,(now-s.last)/3600000);
- const reward=hours*rate()*0.6;
- if(reward<=0){log("暂时没有离线奖励");return}
- s.btc+=reward;s.total+=reward;s.today+=reward;s.last=now;
- log("收取离线奖励 +"+fmt(reward)+" BTC");save();render();
+function confirmPurchase(){
+if(!pending)return;
+s.power+=pending.power;s.miners++;
+log("TEST PURCHASE: "+pending.name+" ("+pending.price+") → +"+pending.power+" GH/s");
+save();
+document.getElementById("successText").textContent=pending.name+" added successfully. No real payment was processed.";
+document.getElementById("confirmBox").style.display="none";
+document.getElementById("successBox").classList.add("show");
 }
-document.getElementById("mineBtn").onclick=mine;
-document.getElementById("upgradeBtn").onclick=upgrade;
-document.getElementById("collectBtn").onclick=collect;
-
+function closeModal(){document.getElementById("modal").classList.remove("show");pending=null}
+function buyGameItem(name,power,cost){
+if(s.btc<cost){alert("Not enough Virtual BTC.");return}
+s.btc-=cost;s.power+=power;s.miners++;log("Bought "+name+" with Virtual BTC");save();
+}
+function daily(){
+let d=new Date().toDateString();
+if(s.day===d){alert("Daily reward already claimed.");return}
+s.day=d;s.power+=5;s.miners++;log("Daily Miner claimed");save();
+}
+function resetGame(){if(confirm("Reset all test data?")){localStorage.removeItem(KEY);location.reload()}}
+let p=35;
 setInterval(()=>{
- const now=Date.now();
- if(new Date().toDateString()!==s.day){s.day=new Date().toDateString();s.today=0;s.streak=0}
- const sec=Math.min(5,(now-s.last)/1000);
- const reward=rate()*sec;
- s.btc+=reward;s.total+=reward;s.today+=reward;s.last=now;
- s.price=Math.max(180000,Math.min(420000,s.price+(Math.random()-.5)*1800));
- save();render();
+const reward=s.power*.00000000002;
+s.btc+=reward;p=(p+4)%101;
+document.getElementById("fill").style.width=p+"%";
+render();save();
 },1000);
-
-log("欢迎来到 Bitcoin Miner Simulator！");
 render();
 </script>
 </body>
 </html>'''
 
-path = Path("/mnt/data/bitcoin-miner-game.html")
+path = Path("/mnt/data/bitcoin-mine-full-test-store.html")
 path.write_text(html, encoding="utf-8")
-print(f"已生成：{path}")
+print(f"已生成完整测试版：{path}")
