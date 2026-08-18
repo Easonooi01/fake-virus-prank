@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Warning</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:#050505;color:white;font-family:Arial,sans-serif;overflow:hidden}
+body{display:flex;align-items:center;justify-content:center;text-align:center}
+.warning,.joke{padding:20px}
+.icon{font-size:70px}
+h1{color:red;font-size:55px;margin:15px 0}
+p{font-size:24px;line-height:1.5}
+.count{font-size:90px;font-weight:bold;margin:20px}
+.joke{display:none}
+.shake{animation:shake .15s infinite}
+@keyframes shake{
+0%,100%{transform:translate(0,0)}
+25%{transform:translate(8px,-5px)}
+50%{transform:translate(-8px,5px)}
+75%{transform:translate(5px,6px)}
+}
+</style>
+</head>
+<body>
+
+<div id="warning" class="warning">
+<div class="icon">⚠️</div>
+<h1>VIRUS DETECTED!</h1>
+<p>ตรวจพบกิจกรรมที่น่าสงสัยในระบบ</p>
+<div id="count" class="count">5</div>
+<p>กำลังตรวจสอบความปลอดภัย...</p>
+</div>
+
+<div id="joke" class="joke">
+<h2>😂 ฮ่าๆๆ!</h2>
+<p>คุณโดนแกล้งแล้ว!</p>
+<p>ไม่ต้องตกใจนะ นี่เป็นแค่การแกล้งเท่านั้น 😆</p>
+<p>โทรศัพท์ของคุณไม่ได้ติดไวรัสจริงๆ</p>
+</div>
+
+<script>
+let n=5;
+const count=document.getElementById("count");
+const warning=document.getElementById("warning");
+const joke=document.getElementById("joke");
+
+setTimeout(()=>document.body.classList.add("shake"),700);
+
+const timer=setInterval(()=>{
+n--;
+count.textContent=n;
+if(n<=0){
+clearInterval(timer);
+warning.style.display="none";
+joke.style.display="block";
+document.body.classList.remove("shake");
+}
+},1000);
+</script>
+
+</body>
+</html>
