@@ -1,122 +1,154 @@
-<!DOCTYPE html>
+from pathlib import Path
+
+html = r'''<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>System Restart</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Bitcoin Miner Simulator</title>
 <style>
 *{box-sizing:border-box}
-html,body{
-  margin:0;
-  width:100%;
-  height:100%;
-  background:#000;
-  color:#fff;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-}
-body{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-}
-.screen{width:100%;padding:30px}
-.logo{
-  font-size:70px;
-  margin-bottom:25px;
-}
-h1{
-  font-size:28px;
-  font-weight:500;
-  margin:10px 0 35px;
-}
-.status{
-  color:#aaa;
-  font-size:18px;
-  margin-bottom:20px;
-}
-.count{
-  font-size:70px;
-  font-weight:600;
-  margin:20px;
-}
-.bar{
-  width:85%;
-  max-width:360px;
-  height:8px;
-  background:#222;
-  border-radius:10px;
-  margin:25px auto;
-  overflow:hidden;
-}
-.progress{
-  height:100%;
-  width:0%;
-  background:#fff;
-  transition:width 1s linear;
-}
-.joke{
-  display:none;
-}
-.joke h1{
-  font-size:34px;
-}
-.joke p{
-  color:#aaa;
-  font-size:20px;
-}
-button{
-  margin-top:20px;
-  padding:12px 24px;
-  border:1px solid #555;
-  border-radius:10px;
-  background:#222;
-  color:#fff;
-  font-size:17px;
-}
+body{margin:0;background:#07111f;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app{max-width:520px;margin:auto;min-height:100vh;padding:18px}
+h1{margin:4px 0 4px;font-size:30px}
+.sub{color:#9fb0c7;margin-bottom:18px}
+.card{background:#101d2e;border:1px solid #243650;border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 8px 30px #0003}
+.row{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.balance{font-size:38px;font-weight:800;margin:8px 0}
+.label{color:#9fb0c7;font-size:14px}
+.price{font-size:24px;font-weight:700}
+button{width:100%;border:0;border-radius:14px;padding:15px;margin-top:10px;font-size:17px;font-weight:700;background:#f7931a;color:#111}
+button.secondary{background:#20324b;color:#fff}
+button:disabled{opacity:.45}
+.mine{font-size:21px;padding:19px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#0b1726;border-radius:14px;padding:13px}
+.stat b{display:block;font-size:20px;margin-top:4px}
+.progress{height:12px;background:#07101c;border-radius:20px;overflow:hidden;margin-top:10px}
+.bar{height:100%;width:0;background:#f7931a;transition:.2s}
+.log{max-height:150px;overflow:auto;color:#b8c7da;font-size:13px;line-height:1.6}
+.note{font-size:12px;color:#7f91aa;line-height:1.5}
+.upgrade{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.upgrade button{width:auto;padding:10px 13px;margin:0}
+.badge{background:#19395b;color:#8fc7ff;border-radius:999px;padding:5px 9px;font-size:12px}
 </style>
 </head>
-
 <body>
+<div class="app">
+  <h1>₿ Bitcoin Miner</h1>
+  <div class="sub">虚拟挖矿模拟器 · 不涉及真钱</div>
 
-<div class="screen" id="restart">
-  <div class="logo">◉</div>
-  <h1>正在重新启动</h1>
-  <div class="status">System Restarting...</div>
-
-  <div class="count" id="count">10</div>
-
-  <div class="bar">
-    <div class="progress" id="progress"></div>
+  <div class="card">
+    <div class="label">游戏内 BTC</div>
+    <div class="balance" id="btc">0.00000000 BTC</div>
+    <div class="row"><span class="label">模拟 BTC 价格</span><span class="price" id="price">RM 300,000</span></div>
   </div>
 
-  <div class="status">请不要关闭此页面</div>
-</div>
+  <div class="card">
+    <div class="row">
+      <div><div class="label">当前算力</div><b id="hash">10 TH/s</b></div>
+      <span class="badge" id="level">Lv.1</span>
+    </div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <button class="mine" id="mineBtn">⛏️ 开始挖矿</button>
+    <button class="secondary" id="collectBtn">🎁 收取离线奖励</button>
+  </div>
 
-<div class="screen joke" id="joke">
-  <div class="logo">😆</div>
-  <h1>你中恶作剧了！</h1>
-  <p>手机没有真的重启 😂</p>
-  <button onclick="location.reload()">再来一次</button>
+  <div class="card">
+    <div class="label">矿机升级</div>
+    <div class="upgrade">
+      <div><b>ASIC Miner</b><div class="note">+10 TH/s · 价格：<span id="upgradeCost">0.00005000</span> BTC</div></div>
+      <button id="upgradeBtn">升级</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="grid">
+      <div class="stat"><span class="label">今日挖矿</span><b id="today">0.00000000</b></div>
+      <div class="stat"><span class="label">总挖矿</span><b id="total">0.00000000</b></div>
+      <div class="stat"><span class="label">连续点击</span><b id="streak">0</b></div>
+      <div class="stat"><span class="label">预计每秒</span><b id="rate">0.00000001</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label">活动记录</div>
+    <div class="log" id="log"></div>
+  </div>
+
+  <div class="card note">
+    ⚠️ 这是纯模拟游戏。BTC、余额、价格和奖励都是虚拟数据，不能充值、提现或兑换真实 Bitcoin / 现金。
+  </div>
 </div>
 
 <script>
-let n=10;
-const count=document.getElementById("count");
-const progress=document.getElementById("progress");
+const KEY="btcMinerSimulatorV1";
+let s=JSON.parse(localStorage.getItem(KEY)||"null")||{
+ btc:0,total:0,today:0,hash:10,level:1,streak:0,price:300000,last:Date.now(),day:new Date().toDateString()
+};
 
-const timer=setInterval(()=>{
-  n--;
-  count.textContent=n;
-  progress.style.width=((10-n)*10)+"%";
+function save(){localStorage.setItem(KEY,JSON.stringify(s))}
+function rate(){return s.hash*0.000000001}
+function cost(){return 0.00005*Math.pow(1.55,s.level-1)}
+function fmt(n){return Number(n).toFixed(8)}
+function log(t){
+ const el=document.getElementById("log");
+ const d=document.createElement("div"); d.textContent="• "+new Date().toLocaleTimeString()+"  "+t;
+ el.prepend(d);
+ while(el.children.length>12)el.lastChild.remove();
+}
+function render(){
+ document.getElementById("btc").textContent=fmt(s.btc)+" BTC";
+ document.getElementById("total").textContent=fmt(s.total);
+ document.getElementById("today").textContent=fmt(s.today);
+ document.getElementById("hash").textContent=s.hash+" TH/s";
+ document.getElementById("level").textContent="Lv."+s.level;
+ document.getElementById("price").textContent="RM "+Math.round(s.price).toLocaleString();
+ document.getElementById("streak").textContent=s.streak;
+ document.getElementById("rate").textContent=fmt(rate());
+ document.getElementById("upgradeCost").textContent=fmt(cost());
+ document.getElementById("upgradeBtn").disabled=s.btc<cost();
+}
+function mine(){
+ const reward=rate()*3*(1+Math.min(s.streak,20)*0.01);
+ s.btc+=reward;s.total+=reward;s.today+=reward;s.streak++;
+ document.getElementById("bar").style.width=Math.min(100,s.streak%101)+"%";
+ log("获得 +"+fmt(reward)+" BTC");
+ save();render();
+}
+function upgrade(){
+ const c=cost();
+ if(s.btc<c)return;
+ s.btc-=c;s.hash+=10;s.level++;
+ s.streak=0;log("矿机升级成功：+10 TH/s");save();render();
+}
+function collect(){
+ const now=Date.now(), hours=Math.min(12,(now-s.last)/3600000);
+ const reward=hours*rate()*0.6;
+ if(reward<=0){log("暂时没有离线奖励");return}
+ s.btc+=reward;s.total+=reward;s.today+=reward;s.last=now;
+ log("收取离线奖励 +"+fmt(reward)+" BTC");save();render();
+}
+document.getElementById("mineBtn").onclick=mine;
+document.getElementById("upgradeBtn").onclick=upgrade;
+document.getElementById("collectBtn").onclick=collect;
 
-  if(n<=0){
-    clearInterval(timer);
-    document.getElementById("restart").style.display="none";
-    document.getElementById("joke").style.display="block";
-  }
+setInterval(()=>{
+ const now=Date.now();
+ if(new Date().toDateString()!==s.day){s.day=new Date().toDateString();s.today=0;s.streak=0}
+ const sec=Math.min(5,(now-s.last)/1000);
+ const reward=rate()*sec;
+ s.btc+=reward;s.total+=reward;s.today+=reward;s.last=now;
+ s.price=Math.max(180000,Math.min(420000,s.price+(Math.random()-.5)*1800));
+ save();render();
 },1000);
-</script>
 
+log("欢迎来到 Bitcoin Miner Simulator！");
+render();
+</script>
 </body>
-</html>
+</html>'''
+
+path = Path("/mnt/data/bitcoin-miner-game.html")
+path.write_text(html, encoding="utf-8")
+print(f"已生成：{path}")
