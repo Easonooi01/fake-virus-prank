@@ -1,62 +1,120 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>System Warning</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>System Restart</title>
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;background:#050505;color:white;font-family:Arial,sans-serif;overflow:hidden}
-body{display:flex;align-items:center;justify-content:center;text-align:center}
-.warning,.joke{padding:20px}
-.icon{font-size:70px}
-h1{color:red;font-size:55px;margin:15px 0}
-p{font-size:24px;line-height:1.5}
-.count{font-size:90px;font-weight:bold;margin:20px}
-.joke{display:none}
-.shake{animation:shake .15s infinite}
-@keyframes shake{
-0%,100%{transform:translate(0,0)}
-25%{transform:translate(8px,-5px)}
-50%{transform:translate(-8px,5px)}
-75%{transform:translate(5px,6px)}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  background:#000;
+  color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+body{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.screen{width:100%;padding:30px}
+.logo{
+  font-size:70px;
+  margin-bottom:25px;
+}
+h1{
+  font-size:28px;
+  font-weight:500;
+  margin:10px 0 35px;
+}
+.status{
+  color:#aaa;
+  font-size:18px;
+  margin-bottom:20px;
+}
+.count{
+  font-size:70px;
+  font-weight:600;
+  margin:20px;
+}
+.bar{
+  width:85%;
+  max-width:360px;
+  height:8px;
+  background:#222;
+  border-radius:10px;
+  margin:25px auto;
+  overflow:hidden;
+}
+.progress{
+  height:100%;
+  width:0%;
+  background:#fff;
+  transition:width 1s linear;
+}
+.joke{
+  display:none;
+}
+.joke h1{
+  font-size:34px;
+}
+.joke p{
+  color:#aaa;
+  font-size:20px;
+}
+button{
+  margin-top:20px;
+  padding:12px 24px;
+  border:1px solid #555;
+  border-radius:10px;
+  background:#222;
+  color:#fff;
+  font-size:17px;
 }
 </style>
 </head>
+
 <body>
 
-<div id="warning" class="warning">
-<div class="icon">⚠️</div>
-<h1>VIRUS DETECTED!</h1>
-<p>ตรวจพบกิจกรรมที่น่าสงสัยในระบบ</p>
-<div id="count" class="count">5</div>
-<p>กำลังตรวจสอบความปลอดภัย...</p>
+<div class="screen" id="restart">
+  <div class="logo">◉</div>
+  <h1>正在重新启动</h1>
+  <div class="status">System Restarting...</div>
+
+  <div class="count" id="count">10</div>
+
+  <div class="bar">
+    <div class="progress" id="progress"></div>
+  </div>
+
+  <div class="status">请不要关闭此页面</div>
 </div>
 
-<div id="joke" class="joke">
-<h2>😂 ฮ่าๆๆ!</h2>
-<p>คุณโดนแกล้งแล้ว!</p>
-<p>ไม่ต้องตกใจนะ นี่เป็นแค่การแกล้งเท่านั้น 😆</p>
-<p>โทรศัพท์ของคุณไม่ได้ติดไวรัสจริงๆ</p>
+<div class="screen joke" id="joke">
+  <div class="logo">😆</div>
+  <h1>你中恶作剧了！</h1>
+  <p>手机没有真的重启 😂</p>
+  <button onclick="location.reload()">再来一次</button>
 </div>
 
 <script>
-let n=5;
+let n=10;
 const count=document.getElementById("count");
-const warning=document.getElementById("warning");
-const joke=document.getElementById("joke");
-
-setTimeout(()=>document.body.classList.add("shake"),700);
+const progress=document.getElementById("progress");
 
 const timer=setInterval(()=>{
-n--;
-count.textContent=n;
-if(n<=0){
-clearInterval(timer);
-warning.style.display="none";
-joke.style.display="block";
-document.body.classList.remove("shake");
-}
+  n--;
+  count.textContent=n;
+  progress.style.width=((10-n)*10)+"%";
+
+  if(n<=0){
+    clearInterval(timer);
+    document.getElementById("restart").style.display="none";
+    document.getElementById("joke").style.display="block";
+  }
 },1000);
 </script>
 
